@@ -10,7 +10,6 @@
 #include "../../status.h"
 
 typedef struct {
-    cool_status_t status;
     uint32_t hour;
     uint32_t minute;
     uint32_t second;
@@ -18,6 +17,6 @@ typedef struct {
 
 cool_status_t hal_logger_init(void);
 
-logger_time_t get_hal_logger_time(void);
+cool_status_t get_hal_logger_time(logger_time_t* logger_time);
 
 #endif //C_LIB_TESTER_HAL_LOGGER_H

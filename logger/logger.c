@@ -196,8 +196,7 @@ static cool_status_t log_generic(log_level_list_t level, const char * restrict f
 
 static cool_status_t print_log_msg(const log_level_and_string_t *log_config, const char * restrict func, const char * restrict msg, va_list args)
 {
-    if (log_config == NULL || logger_conf.level < log_config->level || func == NULL || msg == NULL)
-    {
+    if (log_config == NULL || logger_conf.level < log_config->level) {
         return COOL_NULL_POINTER_ERROR;
     }
 
@@ -214,14 +213,14 @@ static cool_status_t print_log_msg(const log_level_and_string_t *log_config, con
         return COOL_OVERFLOW;
     }
 
-    // Assemble the message
+    // Assemble the message with time buffer
     int snprintf_result = snprintf(buffer, sizeof(buffer), "%s%s%s: %s", log_config->level_str, time_buffer, func, msg);
     if (snprintf_result < 0 || (size_t)snprintf_result >= sizeof(buffer)) {
         return COOL_FORMAT_ERROR;
     }
 
     int vprintf_result = vprintf(buffer, args);
-    if (vprintf_result < 0 || (size_t)vprintf_result != strlen(buffer) - 1) { // -1 for null terminator
+    if (vprintf_result < 0 || (size_t)vprintf_result != strlen(buffer)) {
         return COOL_PRINT_FAILED;
     }
 

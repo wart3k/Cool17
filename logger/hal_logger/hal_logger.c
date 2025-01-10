@@ -4,19 +4,18 @@
 
 #include "hal_logger.h"
 
+#include "Cool17/status.h"
+
 cool_status_t hal_logger_init(void)
 {
-    return COOL_OK;
+    return COOL_NOT_IMPLEMENTED;
 }
 
-logger_time_t get_hal_logger_time(void)
+cool_status_t get_hal_logger_time(logger_time_t* logger_time)
 {
-    logger_time_t current_time = {
-        .status = COOL_UNKNOWN,
-        .hour = 0U,
-        .minute = 0U,
-        .second = 0U
-    };
+    logger_time->hour = 0u;
+    logger_time->minute = 0u;
+    logger_time->second = 0u;
 
-    return current_time;
+    return COOL_UNKNOWN;
 }
