@@ -5,6 +5,7 @@
 #ifndef COOL17_LOGGER_H
 #define COOL17_LOGGER_H
 
+#include <stddef.h>
 #include <stdarg.h>
 
 #include "../status.h"
@@ -107,6 +108,25 @@ cool_status_t log_debug(const char * restrict func, const char * restrict msg, .
 cool_status_t log_trace(const char * restrict func, const char * restrict msg, ...);
 
 /**
+ * @brief Logs an array with specified format and log level.
+ *
+ * This function logs the contents of an array with the given format and log level.
+ *
+ * @param func the function name where the log is triggered.
+ * @param level The log level for the message (e.g., TRACE, DEBUG, etc.).
+ * @param format The format specifier for each array element (e.g., "%d" for integers).
+ * @param array Pointer to the array to log.
+ * @param array_size The size of the array.
+ * @param element_size
+ * @return COOL_OK on success, otherwise an error status.
+ */
+cool_status_t log_array(const char * restrict func,
+                        log_level_list_t level,
+                        const char *format,
+                        const void *array,
+                        size_t array_size);
+
+/**
  * @brief Macro for logging an error message.
  *
  * This macro simplifies calling the `log_error` function.
@@ -147,5 +167,19 @@ cool_status_t log_trace(const char * restrict func, const char * restrict msg, .
  * This macro simplifies calling the `log_trace` function.
  */
 #define CLOGT(msg, ...)     log_trace(__func__, msg, ##__VA_ARGS__)
+
+/**
+ * @brief Logs an array with specified format and log level.
+ *
+ * This macro logs an array using the log_array function with the given format.
+ *
+ * @param level The log level for the message (e.g., TRACE, DEBUG, etc.).
+ * @param format The format specifier for each array element (e.g., "%d" for integers).
+ * @param array Pointer to the array to log.
+ */
+#define CLOG_VAR(level, format, array) \
+    log_array(__func__, level, format, array, sizeof(array) / sizeof(array[0]))
+
+
 
 #endif //COOL17_LOGGER_H

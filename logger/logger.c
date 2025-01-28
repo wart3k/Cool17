@@ -5,8 +5,8 @@
 #include "logger.h"
 
 #include <stdint.h>
-#include <stddef.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #define LOG_LEVEL_COUNT         6U
@@ -227,3 +227,70 @@ cool_status_t log_trace(const char * restrict func, const char * restrict msg, .
     va_end(args);
     return result;
 }
+
+cool_status_t log_array(const char * restrict func,
+                        const log_level_list_t level,
+                        const char *format,
+                        const void *array,
+                        const size_t array_size)
+{
+    if (func == NULL || format == NULL || array == NULL || array_size == 0)
+    {
+        return COOL_WRONG_INPUT_PARAMETER;
+    }
+
+    if((logger_conf.level) < TRACE)
+    {
+        return COOL_OK;
+    }
+
+    const size_t format_length = strlen(format);
+    const size_t total_length = format_length * array_size + 1;
+
+    if (total_length < array_size)
+        return COOL_OVERFLOW;
+
+    char *format_buffer = malloc(total_length);
+    if (format_buffer == NULL)
+        return COOL_NOT_ENOUGH_MEMORY;
+
+    format_buffer[0] = '\0';
+
+    for (size_t i = 0; i < array_size; i++)
+        strcat(format_buffer, format);
+
+    //printf(format, array[0]);
+
+    free(format_buffer);
+
+
+    // char buffer[LOG_PRINT_BUFFER_LEN] = { 0U };
+    // size_t offset = 0;
+    //
+    // for (size_t i = 0; i < array_size; ++i)
+    // {
+    //     int n = snprintf(buffer + offset, sizeof(buffer) - offset, format, ((const int *)array)[i]);
+    //     if (n < 0 || (size_t)n >= sizeof(buffer) - offset)
+    //     {
+    //         return COOL_FORMAT_ERROR;
+    //     }
+    //
+    //     offset += n;
+    //
+    //     if (i < array_size - 1)
+    //     {
+    //         if (offset + 1 >= sizeof(buffer))
+    //         {
+    //             return COOL_OVERFLOW;
+    //         }
+    //
+    //         buffer[offset++] = ' ';
+    //     }
+    // }
+    //
+    // buffer[offset] = '\0';
+
+    return COOL_UNKNOWN;
+}
+
+

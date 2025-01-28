@@ -17,6 +17,7 @@ typedef enum {
     COOL_LOGGER_LEVEL_ERROR,
     COOL_LOGGER_FORMAT_ERROR,
     COOL_NOT_IMPLEMENTED,
+    COOL_NOT_ENOUGH_MEMORY
 }cool_status_t;
 
 #endif //COOL17_STATUS_H
