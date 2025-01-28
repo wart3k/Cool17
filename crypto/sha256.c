@@ -90,7 +90,7 @@ void sha256_transform(uint32_t state[8], const uint8_t block[64]) {
 }
 
 // SHA-256 Padding and Finalization
-void sha256(const uint8_t *data, size_t len, uint8_t hash[32]) {
+void sha256(const char *data, size_t len, uint8_t hash[32]) {
     uint32_t state[8];
     uint8_t block[64];
     uint64_t bitlen = len * 8;
@@ -128,6 +128,78 @@ void sha256(const uint8_t *data, size_t len, uint8_t hash[32]) {
         hash[i * 4 + 1] = (state[i] >> 16) & 0xFF;
         hash[i * 4 + 2] = (state[i] >> 8) & 0xFF;
         hash[i * 4 + 3] = state[i] & 0xFF;
+    }
+}
+
+    // SHA-256 Initialization
+void sha256_init(sha256_ctx *ctx) {
+    // Initial Hash Values (H_INIT)
+    static const uint32_t H_INIT[8] = {
+        0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a,
+        0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19
+    };
+
+    // Copy initial hash values
+    memcpy(ctx->state, H_INIT, sizeof(H_INIT));
+
+    // Initialize bit length and data buffer
+    ctx->bitlen = 0;
+    ctx->datalen = 0;
+}
+
+// SHA-256 Update function for processing data in chunks
+void sha256_update(sha256_ctx *ctx, const uint8_t *data, size_t len) {
+    while (len > 0) {
+        // Process a full block
+        size_t to_copy = 64 - ctx->datalen;
+        if (len < to_copy) {
+            to_copy = len;
+        }
+
+        memcpy(ctx->data + ctx->datalen, data, to_copy);
+        ctx->datalen += to_copy;
+        data += to_copy;
+        len -= to_copy;
+
+        // If buffer is full, process it
+        if (ctx->datalen == 64) {
+            sha256_transform(ctx->state, ctx->data);
+            ctx->bitlen += 512;
+            ctx->datalen = 0;
+        }
+    }
+}
+
+// SHA-256 Finalize the hash and add padding
+void sha256_final(sha256_ctx *ctx, uint8_t hash[32]) {
+    // Add padding
+    ctx->data[ctx->datalen] = 0x80;
+    ctx->datalen++;
+
+    if (ctx->datalen > 56) {
+        // If buffer is full, process it and reset
+        memset(ctx->data + ctx->datalen, 0, 64 - ctx->datalen);
+        sha256_transform(ctx->state, ctx->data);
+        ctx->datalen = 0;
+    }
+
+    // Add bit length
+    memset(ctx->data + ctx->datalen, 0, 56 - ctx->datalen);
+    ctx->bitlen = (ctx->bitlen + ctx->datalen * 8);
+    for (int i = 0; i < 8; i++) {
+        ctx->data[63 - i] = ctx->bitlen & 0xFF;
+        ctx->bitlen >>= 8;
+    }
+
+    // Final transformation
+    sha256_transform(ctx->state, ctx->data);
+
+    // Convert the hash state to bytes
+    for (int i = 0; i < 8; i++) {
+        hash[i * 4] = (ctx->state[i] >> 24) & 0xFF;
+        hash[i * 4 + 1] = (ctx->state[i] >> 16) & 0xFF;
+        hash[i * 4 + 2] = (ctx->state[i] >> 8) & 0xFF;
+        hash[i * 4 + 3] = ctx->state[i] & 0xFF;
     }
 }
 

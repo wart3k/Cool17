@@ -1,9 +1,11 @@
 set(COOL_CRYPTO_SOURCES
-    "sha256.c"
+        "sha256.c"
+        "hmac.c"
 )
 
 set(COOL_CRYPTO_HEADERS
         "sha256.h"
+        "hmac.h"
 )
 
 add_library(${COOL_CRYPTO_LIB} STATIC
