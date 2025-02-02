@@ -1,9 +1,11 @@
 set(COOL_CRYPTO_SOURCES
+        "aes128.c"
         "sha256.c"
         "hmac.c"
 )
 
 set(COOL_CRYPTO_HEADERS
+        "aes128.h"
         "sha256.h"
         "hmac.h"
 )
