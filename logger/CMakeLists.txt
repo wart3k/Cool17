@@ -4,6 +4,8 @@ set(COOL_LOGGER_SOURCES
 
 set(COOL_LOGGER_HEADERS
         "logger.h"
+        "logger_config.h"
+        "logger_config_check.h"
 )
 
 add_library(${COOL_LOGGER_LIB} STATIC

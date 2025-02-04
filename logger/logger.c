@@ -5,12 +5,14 @@
 #include "logger.h"
 
 #include <stdint.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
+#if defined(LOG_WITH_PRINTF)
+#include <stdio.h>
+#endif //defined(LOG_WITH_PRINTF)
+
 #define LOG_LEVEL_COUNT         6U
-#define LOG_PRINT_BUFFER_LEN    UINT16_MAX
 
 typedef struct {
     log_level_list_t level;
@@ -29,7 +31,7 @@ static const char LOG_DEBUG_CHAR[]      = "[DEBUG   ]: ";
 static const char LOG_TRACE_CHAR[]      = "[TRACE   ]: ";
 
 static logger_config_t logger_conf = {
-    .level = INFO
+    .level = DEFAULT_LOG_LEVEL
 };
 
 static const log_level_and_string_t log_level_and_string[LOG_LEVEL_COUNT] = {
@@ -47,23 +49,24 @@ static cool_status_t print_log_msg(const log_level_and_string_t *log_config,
                                    const va_list args)
 {
     if (log_config == NULL || logger_conf.level < log_config->level)
-    {
         return COOL_NULL_POINTER_ERROR;
-    }
-
+    
     char buffer[LOG_PRINT_BUFFER_LEN] = { 0U };
 
     const size_t preamble_len = strlen(log_config->level_str);
     const size_t func_len = strlen(func);
     const size_t msg_len = strlen(msg);
 
-    const size_t complete_msg_len = preamble_len + func_len + 2 + msg_len + 1; // +2 for ": " and +1 for null terminator
-
-    if (complete_msg_len > LOG_PRINT_BUFFER_LEN)
-    {
+    if (preamble_len + func_len + msg_len  >= sizeof(buffer))
         return COOL_OVERFLOW;
-    }
 
+    // +2 for ": " and +1 for null terminator
+    const size_t complete_msg_len = preamble_len + func_len + 2 + msg_len + 1;
+
+    if (complete_msg_len >= sizeof(buffer))
+        return COOL_OVERFLOW;
+
+#if defined(LOG_WITH_PRINTF)
     const int snprintf_result = snprintf(buffer, sizeof(buffer), "%s%s: %s", log_config->level_str, func, msg);
     if (snprintf_result < 0 || (size_t)snprintf_result >= sizeof(buffer))
     {
@@ -75,6 +78,7 @@ static cool_status_t print_log_msg(const log_level_and_string_t *log_config,
     {
         return COOL_PRINT_FAILED;
     }
+#endif //defined(LOG_WITH_PRINTF)
 
     return COOL_OK;
 }
@@ -86,16 +90,6 @@ static cool_status_t log_generic(const log_level_list_t level,
 {
     const cool_status_t result = print_log_msg(&log_level_and_string[level], func, msg, args);
     return result;
-}
-
-cool_status_t logger_init(const log_level_list_t log_level)
-{
-    if (log_level > TRACE)
-    {
-        return COOL_LOGGER_LEVEL_ERROR;
-    }
-    logger_conf.level = log_level;
-    return COOL_OK;
 }
 
 cool_status_t logger_set_level(const log_level_list_t log_level)

@@ -8,29 +8,13 @@
 #include <stddef.h>
 #include <stdarg.h>
 
+#include "logger_config.h"
+
 #include "../status.h"
 
-/**
- * @brief Enum for log levels.
- *
- * Defines the different log levels available for logging.
- */
-typedef enum {
-    ERROR = 0,     /**< Error level */
-    CRITICAL,      /**< Critical level */
-    WARNING,       /**< Warning level */
-    INFO,          /**< Information level */
-    DEBUG,         /**< Debug level */
-    TRACE          /**< Trace level */
-}log_level_list_t;
-
-/**
- * @brief Initializes the logger with a specific log level.
- *
- * @param log_level The initial log level.
- * @return COOL_OK on success, otherwise an error status.
- */
-cool_status_t logger_init(log_level_list_t log_level);
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * @brief Sets the log level for the logger.
@@ -180,6 +164,8 @@ cool_status_t log_array(const char * restrict func,
 #define CLOG_VAR(level, format, array) \
     log_array(__func__, level, format, array, sizeof(array) / sizeof(array[0]))
 
-
+#ifdef __cplusplus
+}
+#endif
 
 #endif //COOL17_LOGGER_H

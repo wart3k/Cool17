@@ -1,0 +1,30 @@
+//
+// Created by Thomas Woltering on 04.02.25.
+//
+
+#ifndef LOGGER_CONFIG_CHECK_H
+#define LOGGER_CONFIG_CHECK_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#include "logger_config.h"
+
+#if DEFAULT_LOG_LEVEL < 0
+#error "Log level must be greater than 0"
+#endif
+
+#if (LOG_PRINT_BUFFER_LEN <= 0u)
+#error "Log buffer length must be greater than 0"
+#endif
+
+#if !defined(LOG_WITH_PRINTF)
+#error "No print selected"
+#endif
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif //LOGGER_CONFIG_CHECK_H
