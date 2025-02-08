@@ -12,20 +12,6 @@ extern "C" {
 #include <stdint.h>
 
 /**
- * @brief Enum for log levels.
- *
- * Defines the different log levels available for logging.
- */
-typedef enum {
-    ERROR = 0,     /**< Error level */
-    CRITICAL,      /**< Critical level */
-    WARNING,       /**< Warning level */
-    INFO,          /**< Information level */
-    DEBUG,         /**< Debug level */
-    TRACE          /**< Trace level */
-}log_level_list_t;
-
-/**
  * @brief default log level
  *
  * Set the default level. All lower log levels will be logged out

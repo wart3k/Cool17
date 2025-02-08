@@ -17,6 +17,44 @@ extern "C" {
 #endif
 
 /**
+ * @brief Enum for log levels.
+ *
+ * Defines the different log levels available for logging.
+ */
+typedef enum {
+    ERROR = 0,      /**< Error level */
+    CRITICAL,       /**< Critical level */
+    WARNING,        /**< Warning level */
+    INFO,           /**< Information level */
+    DEBUG,          /**< Debug level */
+    TRACE           /**< Trace level */
+}log_level_list_t;
+
+/**
+ * @brief enum for format types
+ *
+ * to specify the output format for CLOG_ARRAY
+ */
+typedef enum {
+    U8_DEC,   /**< Unsigned 8-bit decimal */
+    S8_DEC,   /**<  Signed 8-bit decimal */
+    U8_HEX,   /**<  Unsigned 8-bit hex */
+    S8_BIN,   /**<  Signed 8-bit binary */
+    U16_DEC,  /**<  Unsigned 16-bit decimal */
+    S16_DEC,  /**<  Signed 16-bit decimal */
+    U16_HEX,  /**<  Unsigned 16-bit hex */
+    S16_BIN,  /**<  Signed 16-bit binary */
+    U32_DEC,  /**<  Unsigned 32-bit decimal */
+    S32_DEC,  /**<  Signed 32-bit decimal */
+    U32_HEX,  /**<  Unsigned 32-bit hex */
+    S32_BIN,  /**<  Signed 32-bit binary */
+    U64_DEC,  /**<  Unsigned 64-bit decimal */
+    S64_DEC,  /**<  Signed 64-bit decimal */
+    U64_HEX,  /**<  Unsigned 64-bit hex */
+    S64_BIN   /**<  Signed 64-bit binary */
+} log_format_t;
+
+/**
  * @brief Sets the log level for the logger.
  *
  * @param log_level The log level to set.
@@ -101,12 +139,11 @@ cool_status_t log_trace(const char * restrict func, const char * restrict msg, .
  * @param format The format specifier for each array element (e.g., "%d" for integers).
  * @param array Pointer to the array to log.
  * @param array_size The size of the array.
- * @param element_size
  * @return COOL_OK on success, otherwise an error status.
  */
 cool_status_t log_array(const char * restrict func,
                         log_level_list_t level,
-                        const char *format,
+                        log_format_t format,
                         const void *array,
                         size_t array_size);
 
@@ -161,8 +198,8 @@ cool_status_t log_array(const char * restrict func,
  * @param format The format specifier for each array element (e.g., "%d" for integers).
  * @param array Pointer to the array to log.
  */
-#define CLOG_VAR(level, format, array) \
-    log_array(__func__, level, format, array, sizeof(array) / sizeof(array[0]))
+#define CLOG_ARRAY(level, format, array, array_size) \
+    log_array(__func__, level, format, array, array_size)
 
 #ifdef __cplusplus
 }

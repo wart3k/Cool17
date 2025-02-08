@@ -10,6 +10,7 @@ extern "C" {
 #endif
 
 #include "logger_config.h"
+#include "logger.h"
 
 #if DEFAULT_LOG_LEVEL < 0
 #error "Log level must be greater than 0"
@@ -18,6 +19,7 @@ extern "C" {
 #if (LOG_PRINT_BUFFER_LEN <= 0u)
 #error "Log buffer length must be greater than 0"
 #endif
+
 
 #if !defined(LOG_WITH_PRINTF)
 #error "No print selected"

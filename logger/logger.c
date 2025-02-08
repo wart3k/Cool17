@@ -224,67 +224,179 @@ cool_status_t log_trace(const char * restrict func, const char * restrict msg, .
 
 cool_status_t log_array(const char * restrict func,
                         const log_level_list_t level,
-                        const char *format,
+                        const log_format_t format,
                         const void *array,
                         const size_t array_size)
 {
-    if (func == NULL || format == NULL || array == NULL || array_size == 0)
+    if (func == NULL || format > S64_BIN || array == NULL || array_size == 0)
     {
         return COOL_WRONG_INPUT_PARAMETER;
     }
 
-    if((logger_conf.level) < TRACE)
+    if((logger_conf.level) < level)
     {
         return COOL_OK;
     }
 
-    const size_t format_length = strlen(format);
-    const size_t total_length = format_length * array_size + 1;
+    size_t element_size = 0;
 
-    if (total_length < array_size)
-        return COOL_OVERFLOW;
+    switch (format) {
+        case U8_DEC:
+        case S8_DEC:
+        case U8_HEX:
+        case S8_BIN:
+            element_size = sizeof(uint8_t);
+            break;
 
-    char *format_buffer = malloc(total_length);
-    if (format_buffer == NULL)
-        return COOL_NOT_ENOUGH_MEMORY;
+        case U16_DEC:
+        case S16_DEC:
+        case U16_HEX:
+        case S16_BIN:
+            element_size = sizeof(uint16_t);
+            break;
 
-    format_buffer[0] = '\0';
+        case U32_DEC:
+        case S32_DEC:
+        case U32_HEX:
+        case S32_BIN:
+            element_size = sizeof(uint32_t);
+            break;
 
-    for (size_t i = 0; i < array_size; i++)
-        strcat(format_buffer, format);
+        case U64_DEC:
+        case S64_DEC:
+        case U64_HEX:
+        case S64_BIN:
+            element_size = sizeof(uint64_t);
+            break;
 
-    //printf(format, array[0]);
+        default:
+            return COOL_FORMAT_ERROR;
+    }
 
-    free(format_buffer);
+    if (array_size % element_size != 0) {
+        CLOGE("Array size (%zu) is not valid for element size (%zu).", array_size, element_size);
+        return COOL_FORMAT_ERROR;
+    }
+
+    size_t num_elements = array_size / element_size;
+
+    char buffer[LOG_PRINT_BUFFER_LEN] = { 0 };
+    size_t offset = 0;
+
+    for (size_t i = 0; i < num_elements; i++) {
+        int written = 0;
+
+        switch (format) {
+            case U8_DEC:
+                written = snprintf(buffer + offset, sizeof(buffer) - offset, "%u", ((uint8_t *)array)[i]);
+            break;
+
+            case S8_DEC:
+                written = snprintf(buffer + offset, sizeof(buffer) - offset, "%d", ((int8_t *)array)[i]);
+            break;
+
+            case U8_HEX:
+                written = snprintf(buffer + offset, sizeof(buffer) - offset, "0x%02x", ((uint8_t *)array)[i]);
+            break;
+
+            case S8_BIN: {
+                uint8_t value = ((uint8_t *)array)[i];
+                written = snprintf(buffer + offset, sizeof(buffer) - offset, "0b");
+                if (written >= 0 && (size_t)written < sizeof(buffer) - offset) {
+                    offset += written;
+                    for (int b = 7; b >= 0; b--) {
+                        written = snprintf(buffer + offset, sizeof(buffer) - offset, "%d", (value >> b) & 1);
+                        if (written < 0 || (size_t)written >= sizeof(buffer) - offset) {
+                            CLOGE("Buffer overflow occurred.");
+                            return COOL_FORMAT_ERROR;
+                        }
+                        offset += written;
+                    }
+                }
+                break;
+            }
+
+            case U16_DEC:
+                written = snprintf(buffer + offset, sizeof(buffer) - offset, "%u", ((uint16_t *)array)[i]);
+            break;
+
+            case S16_DEC:
+                written = snprintf(buffer + offset, sizeof(buffer) - offset, "%d", ((int16_t *)array)[i]);
+            break;
+
+            case U16_HEX:
+                written = snprintf(buffer + offset, sizeof(buffer) - offset, "0x%04x", ((uint16_t *)array)[i]);
+            break;
+
+            case U32_DEC:
+                written = snprintf(buffer + offset, sizeof(buffer) - offset, "%u", ((uint32_t *)array)[i]);
+            break;
+
+            case S32_DEC:
+                written = snprintf(buffer + offset, sizeof(buffer) - offset, "%d", ((int32_t *)array)[i]);
+            break;
+
+            case U32_HEX:
+                written = snprintf(buffer + offset, sizeof(buffer) - offset, "0x%08x", ((uint32_t *)array)[i]);
+            break;
+
+            case U64_DEC:
+                written = snprintf(buffer + offset, sizeof(buffer) - offset, "%llu", ((uint64_t *)array)[i]);
+            break;
+
+            case S64_DEC:
+                written = snprintf(buffer + offset, sizeof(buffer) - offset, "%lld", ((int64_t *)array)[i]);
+            break;
+
+            case U64_HEX:
+                written = snprintf(buffer + offset, sizeof(buffer) - offset, "0x%016llx", ((uint64_t *)array)[i]);
+            break;
+
+            default:
+                return COOL_FORMAT_ERROR;
+        }
+
+        if (written < 0 || (size_t)written >= sizeof(buffer) - offset) {
+            CLOGE("Buffer overflow occurred.");
+            return COOL_FORMAT_ERROR;
+        }
+
+        offset += written;
+
+        if (i + 1 < num_elements) {
+            if (offset < sizeof(buffer) - 1) {
+                buffer[offset++] = ' ';
+            } else {
+                CLOGE("Buffer overflow occurred.");
+                return COOL_FORMAT_ERROR;
+            }
+        }
+    }
+
+    if (offset < sizeof(buffer) - 1) {
+        buffer[offset++] = '\n';
+    } else {
+        CLOGE("Buffer overflow occurred while adding newline.");
+        return COOL_FORMAT_ERROR;
+    }
 
 
-    // char buffer[LOG_PRINT_BUFFER_LEN] = { 0U };
-    // size_t offset = 0;
-    //
-    // for (size_t i = 0; i < array_size; ++i)
-    // {
-    //     int n = snprintf(buffer + offset, sizeof(buffer) - offset, format, ((const int *)array)[i]);
-    //     if (n < 0 || (size_t)n >= sizeof(buffer) - offset)
-    //     {
-    //         return COOL_FORMAT_ERROR;
-    //     }
-    //
-    //     offset += n;
-    //
-    //     if (i < array_size - 1)
-    //     {
-    //         if (offset + 1 >= sizeof(buffer))
-    //         {
-    //             return COOL_OVERFLOW;
-    //         }
-    //
-    //         buffer[offset++] = ' ';
-    //     }
-    // }
-    //
-    // buffer[offset] = '\0';
-
-    return COOL_UNKNOWN;
+    switch (level) {
+        case ERROR:
+            return log_error(func, "%s", buffer);
+        case CRITICAL:
+            return log_critical(func, "%s", buffer);
+        case WARNING:
+            return log_warning(func, "%s", buffer);
+        case INFO:
+            return log_info(func, "%s", buffer);
+        case DEBUG:
+            return log_debug(func, "%s", buffer);
+        case TRACE:
+            return log_trace(func, "%s", buffer);
+        default:
+            return COOL_FORMAT_ERROR;
+    }
 }
 
 
