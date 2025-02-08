@@ -7,6 +7,8 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#include <inttypes.h>
+
 
 #if defined(LOG_WITH_PRINTF)
 #include <stdio.h>
@@ -328,6 +330,23 @@ cool_status_t log_array(const char * restrict func,
                 written = snprintf(buffer + offset, sizeof(buffer) - offset, "0x%04x", ((uint16_t *)array)[i]);
             break;
 
+            case S16_BIN: {
+                uint16_t value = ((uint16_t *)array)[i];
+                written = snprintf(buffer + offset, sizeof(buffer) - offset, "0b");
+                if (written >= 0 && (size_t)written < sizeof(buffer) - offset) {
+                    offset += written;
+                    for (int b = 15; b >= 0; b--) {
+                        written = snprintf(buffer + offset, sizeof(buffer) - offset, "%d", (value >> b) & 1);
+                        if (written < 0 || (size_t)written >= sizeof(buffer) - offset) {
+                            CLOGE("Buffer overflow occurred.");
+                            return COOL_FORMAT_ERROR;
+                        }
+                        offset += written;
+                    }
+                }
+                break;
+            }
+
             case U32_DEC:
                 written = snprintf(buffer + offset, sizeof(buffer) - offset, "%u", ((uint32_t *)array)[i]);
             break;
@@ -340,17 +359,51 @@ cool_status_t log_array(const char * restrict func,
                 written = snprintf(buffer + offset, sizeof(buffer) - offset, "0x%08x", ((uint32_t *)array)[i]);
             break;
 
+            case S32_BIN: {
+                uint32_t value = ((uint32_t *)array)[i];
+                written = snprintf(buffer + offset, sizeof(buffer) - offset, "0b");
+                if (written >= 0 && (size_t)written < sizeof(buffer) - offset) {
+                    offset += written;
+                    for (int b = 31; b >= 0; b--) {
+                        written = snprintf(buffer + offset, sizeof(buffer) - offset, "%d", (value >> b) & 1);
+                        if (written < 0 || (size_t)written >= sizeof(buffer) - offset) {
+                            CLOGE("Buffer overflow occurred.");
+                            return COOL_FORMAT_ERROR;
+                        }
+                        offset += written;
+                    }
+                }
+                break;
+            }
+
             case U64_DEC:
-                written = snprintf(buffer + offset, sizeof(buffer) - offset, "%llu", ((uint64_t *)array)[i]);
+                written = snprintf(buffer + offset, sizeof(buffer) - offset, "%" PRIu64, ((uint64_t *)array)[i]);
             break;
 
             case S64_DEC:
-                written = snprintf(buffer + offset, sizeof(buffer) - offset, "%lld", ((int64_t *)array)[i]);
+                written = snprintf(buffer + offset, sizeof(buffer) - offset, "%" PRId64, ((int64_t *)array)[i]);
             break;
 
             case U64_HEX:
-                written = snprintf(buffer + offset, sizeof(buffer) - offset, "0x%016llx", ((uint64_t *)array)[i]);
+                written = snprintf(buffer + offset, sizeof(buffer) - offset, "0x%016" PRIx64, ((uint64_t *)array)[i]);
             break;
+
+            case S64_BIN: {
+                uint64_t value = ((uint64_t *)array)[i];
+                written = snprintf(buffer + offset, sizeof(buffer) - offset, "0b");
+                if (written >= 0 && (size_t)written < sizeof(buffer) - offset) {
+                    offset += written;
+                    for (int b = 63; b >= 0; b--) {
+                        written = snprintf(buffer + offset, sizeof(buffer) - offset, "%" PRId64, (value >> b) & 1);
+                        if (written < 0 || (size_t)written >= sizeof(buffer) - offset) {
+                            CLOGE("Buffer overflow occurred.");
+                            return COOL_FORMAT_ERROR;
+                        }
+                        offset += written;
+                    }
+                }
+                break;
+            }
 
             default:
                 return COOL_FORMAT_ERROR;
@@ -374,7 +427,7 @@ cool_status_t log_array(const char * restrict func,
     }
 
     if (offset < sizeof(buffer) - 1) {
-        buffer[offset++] = '\n';
+        buffer[offset] = '\n';
     } else {
         CLOGE("Buffer overflow occurred while adding newline.");
         return COOL_FORMAT_ERROR;
