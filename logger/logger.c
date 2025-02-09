@@ -271,6 +271,10 @@ cool_status_t log_array(const char * restrict func,
             element_size = sizeof(uint64_t);
             break;
 
+        case FLOAT:
+            element_size = sizeof(float);
+            break;
+
         default:
             return COOL_FORMAT_ERROR;
     }
@@ -301,7 +305,8 @@ cool_status_t log_array(const char * restrict func,
                 written = snprintf(buffer + offset, sizeof(buffer) - offset, "0x%02x", ((uint8_t *)array)[i]);
             break;
 
-            case S8_BIN: {
+            case S8_BIN:
+            {
                 uint8_t value = ((uint8_t *)array)[i];
                 written = snprintf(buffer + offset, sizeof(buffer) - offset, "0b");
                 if (written >= 0 && (size_t)written < sizeof(buffer) - offset) {
@@ -315,8 +320,9 @@ cool_status_t log_array(const char * restrict func,
                         offset += written;
                     }
                 }
-                break;
             }
+            break;
+
 
             case U16_DEC:
                 written = snprintf(buffer + offset, sizeof(buffer) - offset, "%u", ((uint16_t *)array)[i]);
@@ -330,7 +336,8 @@ cool_status_t log_array(const char * restrict func,
                 written = snprintf(buffer + offset, sizeof(buffer) - offset, "0x%04x", ((uint16_t *)array)[i]);
             break;
 
-            case S16_BIN: {
+            case S16_BIN:
+            {
                 uint16_t value = ((uint16_t *)array)[i];
                 written = snprintf(buffer + offset, sizeof(buffer) - offset, "0b");
                 if (written >= 0 && (size_t)written < sizeof(buffer) - offset) {
@@ -344,8 +351,8 @@ cool_status_t log_array(const char * restrict func,
                         offset += written;
                     }
                 }
-                break;
             }
+            break;
 
             case U32_DEC:
                 written = snprintf(buffer + offset, sizeof(buffer) - offset, "%u", ((uint32_t *)array)[i]);
@@ -359,7 +366,8 @@ cool_status_t log_array(const char * restrict func,
                 written = snprintf(buffer + offset, sizeof(buffer) - offset, "0x%08x", ((uint32_t *)array)[i]);
             break;
 
-            case S32_BIN: {
+            case S32_BIN:
+            {
                 uint32_t value = ((uint32_t *)array)[i];
                 written = snprintf(buffer + offset, sizeof(buffer) - offset, "0b");
                 if (written >= 0 && (size_t)written < sizeof(buffer) - offset) {
@@ -373,8 +381,8 @@ cool_status_t log_array(const char * restrict func,
                         offset += written;
                     }
                 }
-                break;
             }
+            break;
 
             case U64_DEC:
                 written = snprintf(buffer + offset, sizeof(buffer) - offset, "%" PRIu64, ((uint64_t *)array)[i]);
@@ -388,7 +396,8 @@ cool_status_t log_array(const char * restrict func,
                 written = snprintf(buffer + offset, sizeof(buffer) - offset, "0x%016" PRIx64, ((uint64_t *)array)[i]);
             break;
 
-            case S64_BIN: {
+            case S64_BIN:
+            {
                 uint64_t value = ((uint64_t *)array)[i];
                 written = snprintf(buffer + offset, sizeof(buffer) - offset, "0b");
                 if (written >= 0 && (size_t)written < sizeof(buffer) - offset) {
@@ -402,8 +411,18 @@ cool_status_t log_array(const char * restrict func,
                         offset += written;
                     }
                 }
-                break;
             }
+            break;
+
+
+            case FLOAT:
+                written = snprintf(buffer + offset, sizeof(buffer) - offset, "%f", ((float *)array)[i]);
+                break;
+
+            case DOUBLE:
+                written = snprintf(buffer + offset, sizeof(buffer) - offset, "%fd", ((double *)array)[i]);
+                break;
+
 
             default:
                 return COOL_FORMAT_ERROR;

@@ -51,7 +51,9 @@ typedef enum {
     U64_DEC,  /**<  Unsigned 64-bit decimal */
     S64_DEC,  /**<  Signed 64-bit decimal */
     U64_HEX,  /**<  Unsigned 64-bit hex */
-    S64_BIN   /**<  Signed 64-bit binary */
+    S64_BIN,  /**<  Signed 64-bit binary */
+    FLOAT,     /**<  Float */
+    DOUBLE     /**<  Double */
 } log_format_t;
 
 /**
