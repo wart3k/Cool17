@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <inttypes.h>
+#include <stdbool.h>
 
 
 #if defined(LOG_WITH_PRINTF)
@@ -241,6 +242,20 @@ cool_status_t log_array(const char * restrict func,
     }
 
     size_t element_size = 0;
+    bool is_binary_format = false;
+
+    switch (format) {
+        case S8_BIN:
+        case S16_BIN:
+        case S32_BIN:
+        case S64_BIN:
+            is_binary_format = true;
+            break;
+
+        default:
+            is_binary_format = false;
+            break;
+    }
 
     switch (format) {
         case U8_DEC:
@@ -280,7 +295,7 @@ cool_status_t log_array(const char * restrict func,
     }
 
     if (array_size % element_size != 0) {
-        CLOGE("Array size (%zu) is not valid for element size (%zu).", array_size, element_size);
+        (void)CLOGE("Array size (%zu) is not valid for element size (%zu).", array_size, element_size);
         return COOL_FORMAT_ERROR;
     }
 
@@ -311,10 +326,10 @@ cool_status_t log_array(const char * restrict func,
                 written = snprintf(buffer + offset, sizeof(buffer) - offset, "0b");
                 if (written >= 0 && (size_t)written < sizeof(buffer) - offset) {
                     offset += written;
-                    for (int b = 7; b >= 0; b--) {
+                    for (int8_t b = 7; b >= 0; b--) {
                         written = snprintf(buffer + offset, sizeof(buffer) - offset, "%d", (value >> b) & 1);
                         if (written < 0 || (size_t)written >= sizeof(buffer) - offset) {
-                            CLOGE("Buffer overflow occurred.");
+                            (void)CLOGE("Buffer overflow occurred.");
                             return COOL_FORMAT_ERROR;
                         }
                         offset += written;
@@ -342,10 +357,10 @@ cool_status_t log_array(const char * restrict func,
                 written = snprintf(buffer + offset, sizeof(buffer) - offset, "0b");
                 if (written >= 0 && (size_t)written < sizeof(buffer) - offset) {
                     offset += written;
-                    for (int b = 15; b >= 0; b--) {
+                    for (int8_t b = 15; b >= 0; b--) {
                         written = snprintf(buffer + offset, sizeof(buffer) - offset, "%d", (value >> b) & 1);
                         if (written < 0 || (size_t)written >= sizeof(buffer) - offset) {
-                            CLOGE("Buffer overflow occurred.");
+                            (void)CLOGE("Buffer overflow occurred.");
                             return COOL_FORMAT_ERROR;
                         }
                         offset += written;
@@ -372,10 +387,10 @@ cool_status_t log_array(const char * restrict func,
                 written = snprintf(buffer + offset, sizeof(buffer) - offset, "0b");
                 if (written >= 0 && (size_t)written < sizeof(buffer) - offset) {
                     offset += written;
-                    for (int b = 31; b >= 0; b--) {
+                    for (int8_t b = 31; b >= 0; b--) {
                         written = snprintf(buffer + offset, sizeof(buffer) - offset, "%d", (value >> b) & 1);
                         if (written < 0 || (size_t)written >= sizeof(buffer) - offset) {
-                            CLOGE("Buffer overflow occurred.");
+                            (void)CLOGE("Buffer overflow occurred.");
                             return COOL_FORMAT_ERROR;
                         }
                         offset += written;
@@ -402,7 +417,7 @@ cool_status_t log_array(const char * restrict func,
                 written = snprintf(buffer + offset, sizeof(buffer) - offset, "0b");
                 if (written >= 0 && (size_t)written < sizeof(buffer) - offset) {
                     offset += written;
-                    for (int b = 63; b >= 0; b--) {
+                    for (int8_t b = 63; b >= 0; b--) {
                         written = snprintf(buffer + offset, sizeof(buffer) - offset, "%" PRId64, (value >> b) & 1);
                         if (written < 0 || (size_t)written >= sizeof(buffer) - offset) {
                             CLOGE("Buffer overflow occurred.");
@@ -429,17 +444,18 @@ cool_status_t log_array(const char * restrict func,
         }
 
         if (written < 0 || (size_t)written >= sizeof(buffer) - offset) {
-            CLOGE("Buffer overflow occurred.");
+            (void)CLOGE("Buffer overflow occurred.");
             return COOL_FORMAT_ERROR;
         }
 
-        offset += written;
+        if (!is_binary_format)
+            offset += written;
 
         if (i + 1 < num_elements) {
             if (offset < sizeof(buffer) - 1) {
                 buffer[offset++] = ' ';
             } else {
-                CLOGE("Buffer overflow occurred.");
+                (void)CLOGE("Buffer overflow occurred.");
                 return COOL_FORMAT_ERROR;
             }
         }
@@ -448,24 +464,24 @@ cool_status_t log_array(const char * restrict func,
     if (offset < sizeof(buffer) - 1) {
         buffer[offset] = '\n';
     } else {
-        CLOGE("Buffer overflow occurred while adding newline.");
+        (void)CLOGE("Buffer overflow occurred while adding newline.");
         return COOL_FORMAT_ERROR;
     }
 
 
     switch (level) {
         case ERROR:
-            return log_error(func, "%s", buffer);
+            return log_error(func, buffer);
         case CRITICAL:
-            return log_critical(func, "%s", buffer);
+            return log_critical(func, buffer);
         case WARNING:
-            return log_warning(func, "%s", buffer);
+            return log_warning(func, buffer);
         case INFO:
-            return log_info(func, "%s", buffer);
+            return log_info(func, buffer);
         case DEBUG:
-            return log_debug(func, "%s", buffer);
+            return log_debug(func, buffer);
         case TRACE:
-            return log_trace(func, "%s", buffer);
+            return log_trace(func, buffer);
         default:
             return COOL_FORMAT_ERROR;
     }
