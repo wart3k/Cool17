@@ -118,11 +118,6 @@ cool_status_t log_error(const char * restrict func, const char * restrict msg, .
         return COOL_WRONG_INPUT_PARAMETER;
     }
 
-    if((logger_conf.level) < LOG_LEVEL_ERROR)
-    {
-        return COOL_OK;
-    }
-
     va_list args;
     va_start(args, msg);
     const cool_status_t result = log_generic(LOG_LEVEL_ERROR, func, msg, args);
@@ -252,9 +247,25 @@ cool_status_t log_array(const char * restrict func,
             is_binary_format = true;
             break;
 
-        default:
+        case U8_HEX:
+        case U16_HEX:
+        case U32_HEX:
+        case U64_HEX:
+        case U8_DEC:
+        case U16_DEC:
+        case U32_DEC:
+        case U64_DEC:
+        case S8_DEC:
+        case S16_DEC:
+        case S32_DEC:
+        case S64_DEC:
+        case FLOAT:
+        case DOUBLE:
             is_binary_format = false;
             break;
+
+        default:
+            return COOL_WRONG_INPUT_PARAMETER;
     }
 
     switch (format) {
@@ -290,6 +301,10 @@ cool_status_t log_array(const char * restrict func,
             element_size = sizeof(float);
             break;
 
+        case DOUBLE:
+            element_size = sizeof(double);
+            break;
+
         default:
             return COOL_FORMAT_ERROR;
     }
@@ -302,7 +317,7 @@ cool_status_t log_array(const char * restrict func,
     size_t num_elements = array_size / element_size;
 
     char buffer[LOG_PRINT_BUFFER_LEN] = { 0 };
-    size_t offset = 0;
+    int offset = 0;
 
     for (size_t i = 0; i < num_elements; i++) {
         int written = 0;
@@ -370,11 +385,19 @@ cool_status_t log_array(const char * restrict func,
             break;
 
             case U32_DEC:
+#if defined(__APPLE__) || defined(_WIN32) || defined(__unix__)
                 written = snprintf(buffer + offset, sizeof(buffer) - offset, "%u", ((uint32_t *)array)[i]);
+#else
+                written = snprintf(buffer + offset, sizeof(buffer) - offset, "%lu", ((uint32_t *)array)[i]);
+#endif
             break;
 
             case S32_DEC:
+#if defined(__APPLE__) || defined(_WIN32) || defined(__unix__)
                 written = snprintf(buffer + offset, sizeof(buffer) - offset, "%d", ((int32_t *)array)[i]);
+#else
+                written = snprintf(buffer + offset, sizeof(buffer) - offset, "%ld", ((uint32_t *)array)[i]);
+#endif //defined(__APPLE__) || defined(_WIN32) || defined(__unix__)
             break;
 
             case U32_HEX:
@@ -448,8 +471,9 @@ cool_status_t log_array(const char * restrict func,
             return COOL_FORMAT_ERROR;
         }
 
-        if (!is_binary_format)
+        if (!is_binary_format) {
             offset += written;
+        }
 
         if (i + 1 < num_elements) {
             if (offset < sizeof(buffer) - 1) {
