@@ -401,7 +401,11 @@ cool_status_t log_array(const char * restrict func,
             break;
 
             case U32_HEX:
+#if defined(__APPLE__) || defined(_WIN32) || defined(__unix__)
                 written = snprintf(buffer + offset, sizeof(buffer) - (size_t)offset, "0x%08x", ((uint32_t *)array)[i]);
+#else
+                written = snprintf(buffer + offset, sizeof(buffer) - (size_t)offset, "0x%08lx", ((uint32_t *)array)[i]);
+#endif //defined(__APPLE__) || defined(_WIN32) || defined(__unix__)
             break;
 
             case S32_BIN:
@@ -411,7 +415,13 @@ cool_status_t log_array(const char * restrict func,
                 if (written >= 0 && (size_t)written < sizeof(buffer) - (size_t)offset) {
                     offset += written;
                     for (int8_t b = 31; b >= 0; b--) {
+
+#if defined(__APPLE__) || defined(_WIN32) || defined(__unix__)
                         written = snprintf(buffer + offset, sizeof(buffer) - (size_t)offset, "%d", (value >> b) & 1);
+#else
+                        written = snprintf(buffer + offset, sizeof(buffer) - (size_t)offset, "%ld", (value >> b) & 1);
+#endif //defined(__APPLE__) || defined(_WIN32) || defined(__unix__)
+
                         if (written < 0 || (size_t)written >= sizeof(buffer) - (size_t)offset) {
                             (void)CLOGE("Buffer overflow occurred.");
                             return COOL_FORMAT_ERROR;
