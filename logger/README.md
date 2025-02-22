@@ -13,5 +13,3 @@ To configure the library use the logger_conf.h
 
 ## Known Issues
 - No float and double output with log array
-- binary output not correct with log_array
-- no "new line" after binary output

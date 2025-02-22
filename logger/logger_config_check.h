@@ -25,6 +25,12 @@ extern "C" {
 #error "No print selected"
 #endif
 
+#if defined (BUILD_DEPENDING_LEVELS)
+#if !defined(RELEASE) && !defined(DEBUG)
+#error "No Build Depending Defines"
+#endif // !defined(RELEASE) && !defined(DEBUG)
+#endif // defined (BUILD_DEPENDING_LEVELS)
+
 #ifdef __cplusplus
 }
 #endif
