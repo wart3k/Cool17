@@ -38,12 +38,12 @@ static logger_config_t logger_conf = {
 };
 
 static const log_level_and_string_t log_level_and_string[LOG_LEVEL_COUNT] = {
-    { .level = ERROR, .level_str = LOG_ERROR_CHAR },
-    { .level = CRITICAL, .level_str = LOG_CRITICAL_CHAR },
-    { .level = WARNING, .level_str = LOG_WARNING_CHAR },
-    { .level = INFO, .level_str = LOG_INFO_CHAR },
-    { .level = DEBUG, .level_str = LOG_DEBUG_CHAR },
-    { .level = TRACE, .level_str = LOG_TRACE_CHAR }
+    { .level = LOG_LEVEL_ERROR, .level_str = LOG_ERROR_CHAR },
+    { .level = LOG_LEVEL_CRITICAL, .level_str = LOG_CRITICAL_CHAR },
+    { .level = LOG_LEVEL_WARNING, .level_str = LOG_WARNING_CHAR },
+    { .level = LOG_LEVEL_INFO, .level_str = LOG_INFO_CHAR },
+    { .level = LOG_LEVEL_DEBUG, .level_str = LOG_DEBUG_CHAR },
+    { .level = LOG_LEVEL_TRACE, .level_str = LOG_TRACE_CHAR }
 };
 
 static cool_status_t print_log_msg(const log_level_and_string_t *log_config,
@@ -97,7 +97,7 @@ static cool_status_t log_generic(const log_level_list_t level,
 
 cool_status_t logger_set_level(const log_level_list_t log_level)
 {
-    if(log_level > TRACE)
+    if(log_level > LOG_LEVEL_TRACE)
     {
         return COOL_WRONG_INPUT_PARAMETER;
     }
@@ -118,14 +118,14 @@ cool_status_t log_error(const char * restrict func, const char * restrict msg, .
         return COOL_WRONG_INPUT_PARAMETER;
     }
 
-    if((logger_conf.level) < ERROR)
+    if((logger_conf.level) < LOG_LEVEL_ERROR)
     {
         return COOL_OK;
     }
 
     va_list args;
     va_start(args, msg);
-    const cool_status_t result = log_generic(ERROR, func, msg, args);
+    const cool_status_t result = log_generic(LOG_LEVEL_ERROR, func, msg, args);
     va_end(args);
     return result;
 }
@@ -137,14 +137,14 @@ cool_status_t log_critical(const char * restrict func, const char * restrict msg
         return COOL_WRONG_INPUT_PARAMETER;
     }
 
-    if((logger_conf.level) < CRITICAL)
+    if((logger_conf.level) < LOG_LEVEL_CRITICAL)
     {
         return COOL_OK;
     }
 
     va_list args;
     va_start(args, msg);
-    const cool_status_t result = log_generic(CRITICAL, func, msg, args);
+    const cool_status_t result = log_generic(LOG_LEVEL_CRITICAL, func, msg, args);
     va_end(args);
     return result;
 }
@@ -156,14 +156,14 @@ cool_status_t log_warning(const char * restrict func, const char * restrict msg,
         return COOL_WRONG_INPUT_PARAMETER;
     }
 
-    if((logger_conf.level) < WARNING)
+    if((logger_conf.level) < LOG_LEVEL_WARNING)
     {
         return COOL_OK;
     }
 
     va_list args;
     va_start(args, msg);
-    const cool_status_t result = log_generic(WARNING, func, msg, args);
+    const cool_status_t result = log_generic(LOG_LEVEL_WARNING, func, msg, args);
     va_end(args);
     return result;
 }
@@ -175,14 +175,14 @@ cool_status_t log_info(const char * restrict func, const char * restrict msg, ..
         return COOL_WRONG_INPUT_PARAMETER;
     }
 
-    if((logger_conf.level) < INFO)
+    if((logger_conf.level) < LOG_LEVEL_INFO)
     {
         return COOL_OK;
     }
 
     va_list args;
     va_start(args, msg);
-    const cool_status_t result = log_generic(INFO, func, msg, args);
+    const cool_status_t result = log_generic(LOG_LEVEL_INFO, func, msg, args);
     va_end(args);
     return result;
 }
@@ -194,14 +194,14 @@ cool_status_t log_debug(const char * restrict func, const char * restrict msg, .
         return COOL_WRONG_INPUT_PARAMETER;
     }
 
-    if((logger_conf.level) < DEBUG)
+    if((logger_conf.level) < LOG_LEVEL_DEBUG)
     {
         return COOL_OK;
     }
 
     va_list args;
     va_start(args, msg);
-    const cool_status_t result = log_generic(DEBUG, func, msg, args);
+    const cool_status_t result = log_generic(LOG_LEVEL_DEBUG, func, msg, args);
     va_end(args);
     return result;
 }
@@ -213,14 +213,14 @@ cool_status_t log_trace(const char * restrict func, const char * restrict msg, .
         return COOL_WRONG_INPUT_PARAMETER;
     }
 
-    if((logger_conf.level) < TRACE)
+    if((logger_conf.level) < LOG_LEVEL_TRACE)
     {
         return COOL_OK;
     }
 
     va_list args;
     va_start(args, msg);
-    const cool_status_t result = log_generic(TRACE, func, msg, args);
+    const cool_status_t result = log_generic(LOG_LEVEL_TRACE, func, msg, args);
     va_end(args);
     return result;
 }
@@ -470,17 +470,17 @@ cool_status_t log_array(const char * restrict func,
 
 
     switch (level) {
-        case ERROR:
+        case LOG_LEVEL_ERROR:
             return log_error(func, buffer);
-        case CRITICAL:
+        case LOG_LEVEL_CRITICAL:
             return log_critical(func, buffer);
-        case WARNING:
+        case LOG_LEVEL_WARNING:
             return log_warning(func, buffer);
-        case INFO:
+        case LOG_LEVEL_INFO:
             return log_info(func, buffer);
-        case DEBUG:
+        case LOG_LEVEL_DEBUG:
             return log_debug(func, buffer);
-        case TRACE:
+        case LOG_LEVEL_TRACE:
             return log_trace(func, buffer);
         default:
             return COOL_FORMAT_ERROR;

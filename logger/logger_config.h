@@ -16,7 +16,7 @@ extern "C" {
  *
  * Set the default level. All lower log levels will be logged out
  */
-#define DEFAULT_LOG_LEVEL   INFO
+#define DEFAULT_LOG_LEVEL   LOG_LEVEL_INFO
 
 /**
  * @brief Log Level Buffer

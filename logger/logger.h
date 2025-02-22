@@ -22,12 +22,12 @@ extern "C" {
  * Defines the different log levels available for logging.
  */
 typedef enum {
-    ERROR = 0,      /**< Error level */
-    CRITICAL,       /**< Critical level */
-    WARNING,        /**< Warning level */
-    INFO,           /**< Information level */
-    DEBUG,          /**< Debug level */
-    TRACE           /**< Trace level */
+    LOG_LEVEL_ERROR = 0,      /**< Error level */
+    LOG_LEVEL_CRITICAL,       /**< Critical level */
+    LOG_LEVEL_WARNING,        /**< Warning level */
+    LOG_LEVEL_INFO,           /**< Information level */
+    LOG_LEVEL_DEBUG,          /**< Debug level */
+    LOG_LEVEL_TRACE           /**< Trace level */
 }log_level_list_t;
 
 /**
