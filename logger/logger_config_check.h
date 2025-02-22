@@ -26,7 +26,7 @@ extern "C" {
 #endif
 
 #if defined (BUILD_DEPENDING_LEVELS)
-#if !defined(RELEASE) && !defined(DEBUG)
+#if !defined(RELEASE) && !defined(DEBUG) && !defined(TEST)
 #error "No Build Depending Defines"
 #endif // !defined(RELEASE) && !defined(DEBUG)
 #endif // defined (BUILD_DEPENDING_LEVELS)

@@ -16,13 +16,13 @@ extern "C" {
  *
  * Set the default level. All lower log levels will be logged out
  */
-//#define BUILD_DEPENDING_LEVELS
+#define BUILD_DEPENDING_LEVELS
 
 #if defined (BUILD_DEPENDING_LEVELS)
 
-#if RELEASE
+#if defined(RELEASE)
 #define DEFAULT_LOG_LEVEL   LOG_LEVEL_INFO
-#elif DEBUG || TEST // #if RELEASE
+#elif defined(DEBUG) || defined(TEST) // #if defined(RELEASE)
 #define DEFAULT_LOG_LEVEL   LOG_LEVEL_TRACE
 #endif // DEBUG || TEST
 
