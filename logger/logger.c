@@ -81,8 +81,10 @@ static cool_status_t print_log_msg(const log_level_and_string_t *log_config,
                                    const va_list args)
 {
     if (log_config == NULL || logger_conf.level < log_config->level)
+    {
         return COOL_NULL_POINTER_ERROR;
-    
+    }
+
     char buffer[LOG_PRINT_BUFFER_LEN] = { 0U };
 
     const size_t preamble_len = strlen(log_config->level_str);
@@ -90,13 +92,17 @@ static cool_status_t print_log_msg(const log_level_and_string_t *log_config,
     const size_t msg_len = strlen(msg);
 
     if (preamble_len + func_len + msg_len  >= sizeof(buffer))
+    {
         return COOL_OVERFLOW;
+    }
 
     // +2 for ": " and +1 for null terminator
     const size_t complete_msg_len = preamble_len + func_len + 2 + msg_len + 1;
 
     if (complete_msg_len >= sizeof(buffer))
+    {
         return COOL_OVERFLOW;
+    }
 
 #if defined(LOG_WITH_PRINTF)
     const int snprintf_result = snprintf(buffer, sizeof(buffer), "%s%s: %s", log_config->level_str, func, msg);
@@ -161,7 +167,7 @@ cool_status_t log_critical(const char * restrict func, const char * restrict msg
         return COOL_WRONG_INPUT_PARAMETER;
     }
 
-    if((logger_conf.level) < LOG_LEVEL_CRITICAL)
+    if(logger_conf.level < LOG_LEVEL_CRITICAL)
     {
         return COOL_OK;
     }
@@ -180,7 +186,7 @@ cool_status_t log_warning(const char * restrict func, const char * restrict msg,
         return COOL_WRONG_INPUT_PARAMETER;
     }
 
-    if((logger_conf.level) < LOG_LEVEL_WARNING)
+    if(logger_conf.level < LOG_LEVEL_WARNING)
     {
         return COOL_OK;
     }
@@ -199,7 +205,7 @@ cool_status_t log_info(const char * restrict func, const char * restrict msg, ..
         return COOL_WRONG_INPUT_PARAMETER;
     }
 
-    if((logger_conf.level) < LOG_LEVEL_INFO)
+    if(logger_conf.level < LOG_LEVEL_INFO)
     {
         return COOL_OK;
     }
@@ -218,7 +224,7 @@ cool_status_t log_debug(const char * restrict func, const char * restrict msg, .
         return COOL_WRONG_INPUT_PARAMETER;
     }
 
-    if((logger_conf.level) < LOG_LEVEL_DEBUG)
+    if(logger_conf.level < LOG_LEVEL_DEBUG)
     {
         return COOL_OK;
     }
@@ -237,7 +243,7 @@ cool_status_t log_trace(const char * restrict func, const char * restrict msg, .
         return COOL_WRONG_INPUT_PARAMETER;
     }
 
-    if((logger_conf.level) < LOG_LEVEL_TRACE)
+    if(logger_conf.level < LOG_LEVEL_TRACE)
     {
         return COOL_OK;
     }
@@ -260,7 +266,7 @@ cool_status_t log_array(const char * restrict func,
         return COOL_WRONG_INPUT_PARAMETER;
     }
 
-    if((logger_conf.level) < level)
+    if(logger_conf.level < level)
     {
         return COOL_OK;
     }
@@ -268,7 +274,8 @@ cool_status_t log_array(const char * restrict func,
     size_t element_size = 0;
     bool is_binary_format = false;
 
-    switch (format) {
+    switch (format)
+    {
         case S8_BIN:
         case S16_BIN:
         case S32_BIN:
@@ -297,7 +304,8 @@ cool_status_t log_array(const char * restrict func,
             return COOL_WRONG_INPUT_PARAMETER;
     }
 
-    switch (format) {
+    switch (format)
+    {
         case U8_DEC:
         case S8_DEC:
         case U8_HEX:
@@ -338,20 +346,23 @@ cool_status_t log_array(const char * restrict func,
             return COOL_FORMAT_ERROR;
     }
 
-    if (array_size % element_size != 0) {
+    if (array_size % element_size != 0)
+    {
         (void)CLOGE("Array size (%zu) is not valid for element size (%zu).", array_size, element_size);
         return COOL_FORMAT_ERROR;
     }
 
-    size_t num_elements = array_size / element_size;
+    const size_t num_elements = array_size / element_size;
 
     char buffer[LOG_PRINT_BUFFER_LEN] = { 0 };
     int offset = 0;
 
-    for (size_t i = 0; i < num_elements; i++) {
+    for (size_t i = 0; i < num_elements; i++)
+    {
         int written = 0;
 
-        switch (format) {
+        switch (format)
+        {
             case U8_DEC:
                 written = snprintf(buffer + offset, sizeof(buffer) - (size_t)offset, FORMAT_UNSIGNED_8_BIT, ((uint8_t *)array)[i]);
             break;
@@ -366,16 +377,22 @@ cool_status_t log_array(const char * restrict func,
 
             case S8_BIN:
             {
-                uint8_t value = ((uint8_t *)array)[i];
+                const uint8_t value = ((uint8_t *)array)[i];
                 written = snprintf(buffer + offset, sizeof(buffer) - (size_t)offset, "0b");
-                if (written >= 0 && (size_t)written < sizeof(buffer) - (size_t)offset) {
+                if (written >= 0 && (size_t)written < sizeof(buffer) - (size_t)offset)
+                {
                     offset += written;
-                    for (int8_t b = 7; b >= 0; b--) {
+
+                    for (int8_t b = 7; b >= 0; b--)
+                    {
                         written = snprintf(buffer + offset, sizeof(buffer) - (size_t)offset, FORMAT_SIGNED_8_BIT, (value >> b) & 1);
-                        if (written < 0 || (size_t)written >= sizeof(buffer) - (size_t)offset) {
+
+                        if (written < 0 || (size_t)written >= sizeof(buffer) - (size_t)offset)
+                        {
                             (void)CLOGE("Buffer overflow occurred.");
                             return COOL_FORMAT_ERROR;
                         }
+
                         offset += written;
                     }
                 }
@@ -396,16 +413,22 @@ cool_status_t log_array(const char * restrict func,
 
             case S16_BIN:
             {
-                uint16_t value = ((uint16_t *)array)[i];
+                const uint16_t value = ((uint16_t *)array)[i];
                 written = snprintf(buffer + offset, sizeof(buffer) - (size_t)offset, "0b");
-                if (written >= 0 && (size_t)written < sizeof(buffer) - (size_t)offset) {
+                if (written >= 0 && (size_t)written < sizeof(buffer) - (size_t)offset)
+                {
                     offset += written;
-                    for (int8_t b = 15; b >= 0; b--) {
+
+                    for (int8_t b = 15; b >= 0; b--)
+                    {
                         written = snprintf(buffer + offset, sizeof(buffer) - (size_t)offset, FORMAT_SIGNED_16_BIT, (value >> b) & 1);
-                        if (written < 0 || (size_t)written >= sizeof(buffer) - (size_t)offset) {
+
+                        if (written < 0 || (size_t)written >= sizeof(buffer) - (size_t)offset)
+                        {
                             (void)CLOGE("Buffer overflow occurred.");
                             return COOL_FORMAT_ERROR;
                         }
+
                         offset += written;
                     }
                 }
@@ -426,18 +449,21 @@ cool_status_t log_array(const char * restrict func,
 
             case S32_BIN:
             {
-                uint32_t value = ((uint32_t *)array)[i];
+                const uint32_t value = ((uint32_t *)array)[i];
                 written = snprintf(buffer + offset, sizeof(buffer) - (size_t)offset, "0b");
-                if (written >= 0 && (size_t)written < sizeof(buffer) - (size_t)offset) {
+                if (written >= 0 && (size_t)written < sizeof(buffer) - (size_t)offset)
+                {
                     offset += written;
-                    for (int8_t b = 31; b >= 0; b--) {
-
+                    for (int8_t b = 31; b >= 0; b--)
+                    {
                         written = snprintf(buffer + offset, sizeof(buffer) - (size_t)offset, FORMAT_SIGNED_DEC_32_BIT, (value >> b) & 1);
 
-                        if (written < 0 || (size_t)written >= sizeof(buffer) - (size_t)offset) {
+                        if (written < 0 || (size_t)written >= sizeof(buffer) - (size_t)offset)
+                        {
                             (void)CLOGE("Buffer overflow occurred.");
                             return COOL_FORMAT_ERROR;
                         }
+
                         offset += written;
                     }
                 }
@@ -458,22 +484,27 @@ cool_status_t log_array(const char * restrict func,
 
             case S64_BIN:
             {
-                uint64_t value = ((uint64_t *)array)[i];
+                const uint64_t value = ((uint64_t *)array)[i];
                 written = snprintf(buffer + offset, sizeof(buffer) - (size_t)offset, "0b");
-                if (written >= 0 && (size_t)written < sizeof(buffer) - (size_t)offset) {
+                if (written >= 0 && (size_t)written < sizeof(buffer) - (size_t)offset)
+                {
                     offset += written;
-                    for (int8_t b = 63; b >= 0; b--) {
+
+                    for (int8_t b = 63; b >= 0; b--)
+                    {
                         written = snprintf(buffer + offset, sizeof(buffer) - (size_t)offset, FORMAT_SIGNED_DEC_64_BIT, (value >> b) & 1);
-                        if (written < 0 || (size_t)written >= sizeof(buffer) - (size_t)offset) {
+
+                        if (written < 0 || (size_t)written >= sizeof(buffer) - (size_t)offset)
+                        {
                             CLOGE("Buffer overflow occurred.");
                             return COOL_FORMAT_ERROR;
                         }
+
                         offset += written;
                     }
                 }
             }
             break;
-
 
             case FLOAT:
                 written = snprintf(buffer + offset, sizeof(buffer) - (size_t)offset, FORMAT_FLOAT, ((float *)array)[i]);
@@ -483,39 +514,49 @@ cool_status_t log_array(const char * restrict func,
                 written = snprintf(buffer + offset, sizeof(buffer) - (size_t)offset, FORMAT_DOUBLE, ((double *)array)[i]);
                 break;
 
-
             default:
                 return COOL_FORMAT_ERROR;
         }
 
-        if (written < 0 || (size_t)written >= sizeof(buffer) - (size_t)offset) {
+        if (written < 0 || (size_t)written >= sizeof(buffer) - (size_t)offset)
+        {
             (void)CLOGE("Buffer overflow occurred.");
             return COOL_FORMAT_ERROR;
         }
 
-        if (!is_binary_format) {
+        if (!is_binary_format)
+        {
             offset += written;
         }
 
-        if (i + 1 < num_elements) {
-            if ((size_t)offset < sizeof(buffer) - 1) {
+        if (i + 1 < num_elements)
+        {
+            if ((size_t)offset < sizeof(buffer) - 1)
+            {
                 buffer[offset++] = ' ';
-            } else {
+            }
+
+            else
+            {
                 (void)CLOGE("Buffer overflow occurred.");
                 return COOL_FORMAT_ERROR;
             }
         }
     }
 
-    if ((size_t)offset < sizeof(buffer) - 1) {
+    if ((size_t)offset < sizeof(buffer) - 1)
+    {
         buffer[(size_t)offset] = '\n';
-    } else {
+    }
+
+    else
+    {
         (void)CLOGE("Buffer overflow occurred while adding newline.");
         return COOL_FORMAT_ERROR;
     }
 
-
-    switch (level) {
+    switch (level)
+    {
         case LOG_LEVEL_ERROR:
             return log_error(func, buffer);
         case LOG_LEVEL_CRITICAL:
@@ -532,5 +573,3 @@ cool_status_t log_array(const char * restrict func,
             return COOL_FORMAT_ERROR;
     }
 }
-
-
