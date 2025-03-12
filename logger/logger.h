@@ -10,11 +10,18 @@
 
 #include "logger_config.h"
 
-#include "../status.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+typedef enum {
+    LOGGER_STATUS_OK = 0,
+    LOGGER_NULL_POINTER_ERROR,
+    LOGGER_OVERFLOW,
+    LOGGER_FORMAT_ERROR,
+    LOGGER_PRINT_FAILED,
+    LOGGER_WRONG_INPUT_PARAMETER
+}logger_status_t;
 
 /**
  * @brief Enum for log levels.
@@ -52,17 +59,17 @@ typedef enum {
     S64_DEC,  /**<  Signed 64-bit decimal */
     U64_HEX,  /**<  Unsigned 64-bit hex */
     S64_BIN,  /**<  Signed 64-bit binary */
-    FLOAT,     /**<  Float */
-    DOUBLE     /**<  Double */
+    FLOAT,    /**<  Float */
+    DOUBLE    /**<  Double */
 } log_format_t;
 
 /**
  * @brief Sets the log level for the logger.
  *
  * @param log_level The log level to set.
- * @return COOL_OK on success, otherwise an error status.
+ * @return LOGGER_STATUS_OK on success, otherwise an error status.
  */
-cool_status_t logger_set_level(log_level_list_t log_level);
+logger_status_t logger_set_level(log_level_list_t log_level);
 
 /**
  * @brief Retrieves the current log level.
@@ -77,9 +84,9 @@ log_level_list_t logger_get_level(void);
  * @param func The function name where the log is triggered.
  * @param msg The message to log.
  * @param ... Additional arguments for the message format.
- * @return COOL_OK on success, otherwise an error status.
+ * @return LOGGER_STATUS_OK on success, otherwise an error status.
  */
-cool_status_t log_error(const char * restrict func, const char * restrict msg, ...);
+logger_status_t log_error(const char * restrict func, const char * restrict msg, ...);
 
 /**
  * @brief Logs a critical message with optional arguments.
@@ -87,9 +94,9 @@ cool_status_t log_error(const char * restrict func, const char * restrict msg, .
  * @param func The function name where the log is triggered.
  * @param msg The message to log.
  * @param ... Additional arguments for the message format.
- * @return COOL_OK on success, otherwise an error status.
+ * @return LOGGER_STATUS_OK on success, otherwise an error status.
  */
-cool_status_t log_critical(const char * restrict func, const char * restrict msg, ...);
+logger_status_t log_critical(const char * restrict func, const char * restrict msg, ...);
 
 /**
  * @brief Logs a warning message with optional arguments.
@@ -97,9 +104,9 @@ cool_status_t log_critical(const char * restrict func, const char * restrict msg
  * @param func The function name where the log is triggered.
  * @param msg The message to log.
  * @param ... Additional arguments for the message format.
- * @return COOL_OK on success, otherwise an error status.
+ * @return LOGGER_STATUS_OK on success, otherwise an error status.
  */
-cool_status_t log_warning(const char * restrict func, const char * restrict msg, ...);
+logger_status_t log_warning(const char * restrict func, const char * restrict msg, ...);
 
 /**
  * @brief Logs an informational message with optional arguments.
@@ -107,9 +114,9 @@ cool_status_t log_warning(const char * restrict func, const char * restrict msg,
  * @param func The function name where the log is triggered.
  * @param msg The message to log.
  * @param ... Additional arguments for the message format.
- * @return COOL_OK on success, otherwise an error status.
+ * @return LOGGER_STATUS_OK on success, otherwise an error status.
  */
-cool_status_t log_info(const char * restrict func, const char * restrict msg, ...);
+logger_status_t log_info(const char * restrict func, const char * restrict msg, ...);
 
 /**
  * @brief Logs a debug message with optional arguments.
@@ -117,9 +124,9 @@ cool_status_t log_info(const char * restrict func, const char * restrict msg, ..
  * @param func The function name where the log is triggered.
  * @param msg The message to log.
  * @param ... Additional arguments for the message format.
- * @return COOL_OK on success, otherwise an error status.
+ * @return LOGGER_STATUS_OK on success, otherwise an error status.
  */
-cool_status_t log_debug(const char * restrict func, const char * restrict msg, ...);
+logger_status_t log_debug(const char * restrict func, const char * restrict msg, ...);
 
 /**
  * @brief Logs a trace message with optional arguments.
@@ -127,9 +134,9 @@ cool_status_t log_debug(const char * restrict func, const char * restrict msg, .
  * @param func The function name where the log is triggered.
  * @param msg The message to log.
  * @param ... Additional arguments for the message format.
- * @return COOL_OK on success, otherwise an error status.
+ * @return LOGGER_STATUS_OK on success, otherwise an error status.
  */
-cool_status_t log_trace(const char * restrict func, const char * restrict msg, ...);
+logger_status_t log_trace(const char * restrict func, const char * restrict msg, ...);
 
 /**
  * @brief Logs an array with specified format and log level.
@@ -141,9 +148,9 @@ cool_status_t log_trace(const char * restrict func, const char * restrict msg, .
  * @param format The format specifier for each array element (e.g., "%d" for integers).
  * @param array Pointer to the array to log.
  * @param array_size The size of the array.
- * @return COOL_OK on success, otherwise an error status.
+ * @return LOGGER_STATUS_OK on success, otherwise an error status.
  */
-cool_status_t log_array(const char * restrict func,
+logger_status_t log_array(const char * restrict func,
                         log_level_list_t level,
                         log_format_t format,
                         const void *array,
