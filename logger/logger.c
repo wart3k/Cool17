@@ -32,6 +32,9 @@
 #define FORMAT_FLOAT                    "%f"
 #define FORMAT_DOUBLE                   "%fd"
 #else
+#define FORMAT_UNSIGNED_8_BIT           "%u"
+#define FORMAT_SIGNED_8_BIT             "%d"
+#define FORMAT_HEX_8_BIT                "0x%02x"
 #define FORMAT_UNSIGNED_16_BIT          "%u"
 #define FORMAT_SIGNED_16_BIT            "%d"
 #define FORMAT_HEX_16_BIT               "0x%04x"
