@@ -39,11 +39,12 @@
 #define FORMAT_SIGNED_16_BIT            "%d"
 #define FORMAT_HEX_16_BIT               "0x%04x"
 #define FORMAT_UNSIGNED_16_BIT          "%u"
-#define FORMAT_UNSIGNED_32_DEC          "%lu"
-#define FORMAT_SIGNED_32_DEC            "%ld"
+#define FORMAT_UNSIGNED_DEC_32_BIT      "%lu"
+#define FORMAT_SIGNED_DEC_32_BIT        "%ld"
 #define FORMAT_HEX_32_BIT               "0x%08lx"
 #define FORMAT_UNSIGNED_DEC_64_BIT      "%" PRIu64
 #define FORMAT_SIGNED_DEC_64_BIT        "%" PRId64
+#define FORMAT_HEX_64_BIT               "0x%016" PRIx64
 #define FORMAT_FLOAT                    "%f"
 #define FORMAT_DOUBLE                   "%fd"
 #endif
