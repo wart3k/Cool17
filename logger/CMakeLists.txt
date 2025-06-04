@@ -4,13 +4,9 @@ set(COOL_LOGGER_SOURCES
 
 set(COOL_LOGGER_HEADERS
         "logger.h"
+        "logger_config.h"
+        "logger_config_check.h"
 )
-
-set(COOL_HAL_LOGGER_LIB
-        cool_hal_logger
-)
-
-add_subdirectory(hal_logger)
 
 add_library(${COOL_LOGGER_LIB} STATIC
         ${COOL_LOGGER_SOURCES}
