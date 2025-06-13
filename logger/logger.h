@@ -14,14 +14,20 @@
 extern "C" {
 #endif
 
+/**
+ * @brief Logger status and error codes
+ *
+ * Return codes used by all logger functions to indicate success or failure.
+ * These codes help with debugging and error handling in the logging system.
+ */
 typedef enum {
-    LOGGER_STATUS_OK = 0,
-    LOGGER_NULL_POINTER_ERROR,
-    LOGGER_OVERFLOW,
-    LOGGER_FORMAT_ERROR,
-    LOGGER_PRINT_FAILED,
-    LOGGER_WRONG_INPUT_PARAMETER
-}logger_status_t;
+    LOGGER_STATUS_OK = 0,               /**< Operation completed successfully */
+    LOGGER_NULL_POINTER_ERROR,          /**< NULL pointer passed as parameter */
+    LOGGER_OVERFLOW,                    /**< Buffer overflow occurred during formatting */
+    LOGGER_FORMAT_ERROR,                /**< Error in format string or data formatting */
+    LOGGER_PRINT_FAILED,                /**< Output operation failed */
+    LOGGER_WRONG_INPUT_PARAMETER        /**< Invalid input parameter provided */
+} logger_status_t;
 
 /**
  * @brief Enum for log levels.
@@ -139,7 +145,7 @@ logger_status_t log_debug(const char * restrict func, const char * restrict msg,
 logger_status_t log_trace(const char * restrict func, const char * restrict msg, ...);
 
 /**
- * @brief Logs an array with specified format and log level.
+ * @brief Logs an array with a specified format and log level.
  *
  * This function logs the contents of an array with the given format and log level.
  *
@@ -161,45 +167,45 @@ logger_status_t log_array(const char * restrict func,
  *
  * This macro simplifies calling the `log_error` function.
  */
-#define CLOGE(msg, ...)     log_error(__func__, msg, ##__VA_ARGS__)
+#define CLOGE(msg, ...)     log_error(LOG_FUNC_NAME, msg, ##__VA_ARGS__)
 
 /**
  * @brief Macro for logging a critical message.
  *
  * This macro simplifies calling the `log_critical` function.
  */
-#define CLOGC(msg, ...)     log_critical(__func__, msg, ##__VA_ARGS__)
+#define CLOGC(msg, ...)     log_critical(LOG_FUNC_NAME, msg, ##__VA_ARGS__)
 
 /**
  * @brief Macro for logging a warning message.
  *
  * This macro simplifies calling the `log_warning` function.
  */
-#define CLOGW(msg, ...)     log_warning(__func__, msg, ##__VA_ARGS__)
+#define CLOGW(msg, ...)     log_warning(LOG_FUNC_NAME, msg, ##__VA_ARGS__)
 
 /**
  * @brief Macro for logging an informational message.
  *
  * This macro simplifies calling the `log_info` function.
  */
-#define CLOGI(msg, ...)     log_info(__func__, msg, ##__VA_ARGS__)
+#define CLOGI(msg, ...)     log_info(LOG_FUNC_NAME, msg, ##__VA_ARGS__)
 
 /**
  * @brief Macro for logging a debug message.
  *
  * This macro simplifies calling the `log_debug` function.
  */
-#define CLOGD(msg, ...)     log_debug(__func__, msg, ##__VA_ARGS__)
+#define CLOGD(msg, ...)     log_debug(LOG_FUNC_NAME, msg, ##__VA_ARGS__)
 
 /**
  * @brief Macro for logging a trace message.
  *
  * This macro simplifies calling the `log_trace` function.
  */
-#define CLOGT(msg, ...)     log_trace(__func__, msg, ##__VA_ARGS__)
+#define CLOGT(msg, ...)     log_trace(LOG_FUNC_NAME, msg, ##__VA_ARGS__)
 
 /**
- * @brief Logs an array with specified format and log level.
+ * @brief Logs an array with a specified format and log level.
  *
  * This macro logs an array using the log_array function with the given format.
  *
@@ -208,7 +214,7 @@ logger_status_t log_array(const char * restrict func,
  * @param array Pointer to the array to log.
  */
 #define CLOG_ARRAY(level, format, array, array_size) \
-    log_array(__func__, level, format, array, array_size)
+    log_array(LOG_FUNC_NAME, level, format, array, array_size)
 
 #ifdef __cplusplus
 }
