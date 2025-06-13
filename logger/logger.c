@@ -146,7 +146,15 @@ static logger_status_t print_log_msg(const log_level_and_string_t *log_config,
     {
         return LOGGER_PRINT_FAILED;
     }
-#endif //defined(LOG_WITH_PRINTF)
+#elif defined(LOG_WITH_COOL_PRINT)
+    // TODO: Implement custom print backend
+    (void)buffer;
+    (void)args;
+    return LOGGER_UNKNOWN_ERROR;
+#else
+#error "Error in logger_config.h! Please define LOG_WITH_PRINTF or LOG_WITH_COOL_PRINT".
+#endif // defined(LOG_WITH_PRINTF)
+
 
     return LOGGER_STATUS_OK;
 }
@@ -285,6 +293,7 @@ logger_status_t log_trace(const char * restrict func, const char * restrict msg,
     return result;
 }
 
+#if defined(LOG_WITH_PRINTF)
 static int format_binary(char *buffer, size_t buffer_size, const uint64_t value, const size_t num_bits) {
     if (buffer == NULL || num_bits == 0 || (num_bits & (num_bits - 1)) != 0) {
         return LOGGER_WRONG_INPUT_PARAMETER;
@@ -316,6 +325,21 @@ static int format_element(char *buffer, size_t buffer_size, const void *element,
 
     return snprintf(buffer, buffer_size, format_info[format].format_str, *(const uint64_t *)element);
 }
+#elif defined(LOG_WITH_COOL_PRINT)
+// TODO: Implement custom format_binary for COOL_PRINT backend
+static int format_binary(char *buffer, size_t buffer_size, const uint64_t value, const size_t num_bits) {
+    (void)buffer; (void)buffer_size; (void)value; (void)num_bits;
+    return LOGGER_WRONG_INPUT_PARAMETER;
+}
+
+// TODO: Implement custom format_element for COOL_PRINT backend
+static int format_element(char *buffer, size_t buffer_size, const void *element, const log_format_t format) {
+    (void)buffer; (void)buffer_size; (void)element; (void)format;
+    return LOGGER_WRONG_INPUT_PARAMETER;
+}
+#else
+#error "Error in logger_config.h! Please define LOG_WITH_PRINTF or LOG_WITH_COOL_PRINT".
+#endif
 
 logger_status_t log_array(const char *restrict func, const log_level_list_t level, const log_format_t format,
                           const void *array, const size_t array_size) {

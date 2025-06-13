@@ -26,7 +26,8 @@ typedef enum {
     LOGGER_OVERFLOW,                    /**< Buffer overflow occurred during formatting */
     LOGGER_FORMAT_ERROR,                /**< Error in format string or data formatting */
     LOGGER_PRINT_FAILED,                /**< Output operation failed */
-    LOGGER_WRONG_INPUT_PARAMETER        /**< Invalid input parameter provided */
+    LOGGER_WRONG_INPUT_PARAMETER,       /**< Invalid input parameter provided */
+    LOGGER_UNKNOWN_ERROR                /**< Unknown error occurred */
 } logger_status_t;
 
 /**
