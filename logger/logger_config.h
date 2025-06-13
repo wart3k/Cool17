@@ -12,9 +12,9 @@ extern "C" {
 #include <stdint.h>
 
 /**
- * @brief default log level depending on Build Defines
+ * @brief Default log level depending on Build Defines.
  *
- * Set the default level. All lower log levels will be logged out
+ * Set the default level. All lower log levels will be logged out.
  */
 #define BUILD_DEPENDING_LEVELS
 
@@ -32,18 +32,23 @@ extern "C" {
 
 #endif // defined (BUILD_DEPENDING_LEVELS)
 /**
- * @brief Log Level Buffer
+ * @brief Log Level Buffer.
  *
- * Set the maximum number of the print buffer
+ * Set the maximum number of the print buffer.
  */
 #define LOG_PRINT_BUFFER_LEN    UINT16_MAX
 
 /**
- * @brief Log with printf
+ * @brief Log output method selection.
  *
- * use printf for the output log
+ * Choose one of the following output methods:
+ * - LOG_WITH_PRINTF: Use standard printf functions (higher memory usage)
+ * - LOG_WITH_COOL_PRINT: Use custom lightweight print implementation (lower memory usage)
  */
-#define LOG_WITH_PRINTF
+// Uncomment ONE of the following lines:
+// #define LOG_WITH_PRINTF
+#define LOG_WITH_COOL_PRINT
+
 
 #ifdef __cplusplus
 }

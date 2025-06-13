@@ -21,9 +21,12 @@ extern "C" {
 #endif
 
 
-#if !defined(LOG_WITH_PRINTF)
-#error "No print selected"
+#if defined(LOG_WITH_PRINTF) && defined(LOG_WITH_COOL_PRINT)
+#error "Only one print method can be selected: either LOG_WITH_PRINTF or LOG_WITH_COOL_PRINT"
+#elif !defined(LOG_WITH_PRINTF) && !defined(LOG_WITH_COOL_PRINT)
+#error "No print method selected: define either LOG_WITH_PRINTF or LOG_WITH_COOL_PRINT"
 #endif
+
 
 #if defined (BUILD_DEPENDING_LEVELS)
 #if !defined(RELEASE) && !defined(DEBUG) && !defined(TEST)
